@@ -1,4 +1,4 @@
-setwd("/Users/takayukitamura/Documents/R_Computing/us_employment")
+setwd("/Users/takayukitamura/Documents/R_Computing")
 library(tidyverse)
 library(ggtext)
 library(glue)
@@ -59,9 +59,34 @@ nfp_data$date <- as.Date(nfp_data$date, format = "%Y-%m-%d")
 highlight_data <- nfp_data %>% 
   filter(date == max(date))
 
-latest_month <- month(highlight_data$date, label = TRUE, abbr = TRUE)
+latest_month <- month(highlight_data$date, label = TRUE, abbr = FALSE)
+year <- year(highlight_data$date)
 latest_job_change <- highlight_data$monthly_change
-consensus <- 75
+latest_nfp <- nfp_data %>% 
+  filter(latest_month == T) %>% 
+  mutate(monthly_change_status = if_else(is.na(monthly_change), NA_character_,
+                                         if_else(monthly_change > 0, "increased",
+                                                 if_else(monthly_change < 0, "decreased", 
+                                                         "flat"))))
+
+latest_monthly_status <- latest_nfp$monthly_change_status
+
+consensus <- 50
+latest_jobless <- 4.4
+previsou_jobless <- 4.3
+
+jobless_change <- latest_jobless - previsou_jobless
+jobless_status <- if_else(jobless_change > 0, "rose",
+                          if_else(jobless_change < 0, "fell",
+                                  "flat"))
+
+
+compared_consensus <- latest_nfp %>% 
+  mutate(vs_consensus = if_else(monthly_change > consensus, "beat",
+                                if_else(monthly_change < consensus, "fell short",
+                         "flat")))
+    
+comp_consensus <- compared_consensus$vs_consensus
 
 # month("2025-08-01", )
 
@@ -99,8 +124,8 @@ nfp_data %>%
   filter(date >= "2021-01-01") %>% 
   ggplot(aes(x = date, y = monthly_change, fill = latest_month)) +
   geom_col(show.legend = FALSE) +
-  labs(#title = glue("Monthly Changes in US Non-Farm Payrolls in {latest_month} 2025 was {latest_job_change},000, fell short to the consensus expectations {consensus},000, Jobless Rate rose to 4.3% from 4.2%"),
-    title = "US added only 22,000 jobs in August vs. market expected 75,000",
+  labs(title = glue("Monthly Changes in US Non-Farm Payrolls in {latest_month}, {year}, {latest_monthly_status} {latest_job_change},000, {comp_consensus} to the consensus at {consensus},000; Jobless Rate {jobless_status} to {latest_jobless}% from {previsou_jobless}%"),
+    #title = "US added only 22,000 jobs in August vs. market expected 75,000",
        x = NULL,
        y = "Monthly Change in NFP(x1,000)",
        caption = "<i>FRED(Federal Reserve Economic Data)") +

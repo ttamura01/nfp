@@ -1,5 +1,5 @@
 # US Job Creation by Year
-setwd("/Users/takayukitamura/Documents/R_Computing/us_employment")
+setwd("/Users/takayukitamura/Documents/R_Computing/nfp")
 library(tidyverse)
 library(lubridate)
 library(ggtext)
@@ -7,16 +7,30 @@ library(glue)
 library(patchwork)
 library(showtext)
 library(scales)
+library(fredr)
 
 # Load data
-nfp_data <- read.csv("https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23ebf3fb&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1320&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=PAYEMS&scale=left&cosd=1939-01-01&coed=2025-07-01&line_color=%230073e6&link_values=false&line_style=solid&mark_type=none&mw=3&lw=3&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2025-08-01&revision_date=2025-08-01&nd=1939-01-01") %>%
-  rename(date = observation_date, nfp = PAYEMS) %>% 
+#Set my FRED API key
+fredr_set_key("0c5fd2514c7d98427fe3c931e2fcb244")
+
+# Overall unemployment
+nfp_data <- fredr(series_id = "PAYEMS") %>% 
+  select(date = date, nfp = value) %>% 
   mutate(
     date = as.Date(date),
     year = year(date),
     month = month(date, label = TRUE)
   ) %>%
   filter(date >= "2009-12-01")
+  
+# nfp_data <- read.csv("https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23ebf3fb&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1320&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=PAYEMS&scale=left&cosd=1939-01-01&coed=2025-07-01&line_color=%230073e6&link_values=false&line_style=solid&mark_type=none&mw=3&lw=3&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2025-08-01&revision_date=2025-08-01&nd=1939-01-01") %>%
+#   rename(date = observation_date, nfp = PAYEMS) %>% 
+#   mutate(
+#     date = as.Date(date),
+#     year = year(date),
+#     month = month(date, label = TRUE)
+#   ) %>%
+#   filter(date >= "2009-12-01")
 
 # December NFP of previous year
 dec_nfp_prev_year <- nfp_data %>% 
