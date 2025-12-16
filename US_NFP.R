@@ -71,9 +71,9 @@ latest_nfp <- nfp_data %>%
 
 latest_monthly_status <- latest_nfp$monthly_change_status
 
-consensus <- 50
-latest_jobless <- 4.4
-previsou_jobless <- 4.3
+consensus <- 45
+latest_jobless <- 4.6
+previsou_jobless <- 4.4
 
 jobless_change <- latest_jobless - previsou_jobless
 jobless_status <- if_else(jobless_change > 0, "rose",
@@ -124,7 +124,8 @@ nfp_data %>%
   filter(date >= "2021-01-01") %>% 
   ggplot(aes(x = date, y = monthly_change, fill = latest_month)) +
   geom_col(show.legend = FALSE) +
-  labs(title = glue("Monthly Changes in US Non-Farm Payrolls in {latest_month}, {year}, {latest_monthly_status} {latest_job_change},000, {comp_consensus} to the consensus at {consensus},000; Jobless Rate {jobless_status} to {latest_jobless}% from {previsou_jobless}%"),
+  labs(
+    title = glue("Monthly Changes in US Non-Farm Payrolls in {latest_month} {year}, {latest_monthly_status} {latest_job_change},000, {comp_consensus} to the consensus at {consensus},000; Jobless Rate {jobless_status} to {latest_jobless}% from {previsou_jobless}%"),
     #title = "US added only 22,000 jobs in August vs. market expected 75,000",
        x = NULL,
        y = "Monthly Change in NFP(x1,000)",
@@ -160,6 +161,8 @@ nfp_data %>%
        x = NULL) 
 
 ggsave("us_nfp.png",height = 6.6, width = 6 )
+
+
 
 
 
