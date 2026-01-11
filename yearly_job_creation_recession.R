@@ -44,10 +44,14 @@ df_year <- nfp_yearly %>%
   left_join(rec_year, by = "year") %>%
   mutate(
     recession_year = replace_na(recession_year, 0),
-    year_f = factor(year)
+    year_f = factor(year),
+    if_latest_year = year == max(year)
   )
 
-p <- ggplot(df_year, aes(x = year_f, y = annual_job_creation_k)) +
+highlight <- df_year %>% 
+  filter(if_latest_year == TRUE)
+
+p <- ggplot(df_year, aes(x = year_f, y = annual_job_creation_k, fill = if_latest_year)) +
   # Shade recession years
   geom_rect(
     data = df_year %>% filter(recession_year == 1),
@@ -57,9 +61,11 @@ p <- ggplot(df_year, aes(x = year_f, y = annual_job_creation_k)) +
     inherit.aes = FALSE,
     alpha = 0.1
   ) +
-  geom_col() +
+  geom_col(show.legend = FALSE) +
   geom_hline(yintercept = 0) +
   scale_y_continuous(labels = label_number(accuracy = 1)) +
+  scale_fill_manual(breaks = c(FALSE, TRUE),
+                    values = c("steelblue","blue")) +
   labs(
     title = "Annual Job Creation (Dec-to-Dec)",
     subtitle = "PAYEMS (Total Nonfarm Payrolls, SA). Recession shading: USREC.",
