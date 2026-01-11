@@ -51,7 +51,11 @@ df_year <- nfp_yearly %>%
 highlight <- df_year %>% 
   filter(if_latest_year == TRUE)
 
-p <- ggplot(df_year, aes(x = year_f, y = annual_job_creation_k, fill = if_latest_year)) +
+median <- format(median(df_year$annual_job_creation_k), big.mark = ",", scientific = FALSE)
+latest_year <- highlight$year
+latest_job_creation <- highlight$annual_job_creation_k
+
+ggplot(df_year, aes(x = year_f, y = annual_job_creation_k, fill = if_latest_year)) +
   # Shade recession years
   geom_rect(
     data = df_year %>% filter(recession_year == 1),
@@ -62,27 +66,31 @@ p <- ggplot(df_year, aes(x = year_f, y = annual_job_creation_k, fill = if_latest
     alpha = 0.1
   ) +
   geom_col(show.legend = FALSE) +
-  geom_hline(yintercept = 0) +
-  scale_y_continuous(labels = label_number(accuracy = 1)) +
+  geom_text(
+    aes(label = comma(round(annual_job_creation_k, 0))),
+    vjust = ifelse(df_year$annual_job_creation_k >= 0, -1, 1.5),
+    size = 3
+  ) +
+  geom_hline(yintercept = 2049, color = "red", linetype = "dashed") +
+  # scale_y_continuous(labels = label_number(accuracy = 1)) +
+  scale_y_continuous(labels = label_comma()) +
   scale_fill_manual(breaks = c(FALSE, TRUE),
-                    values = c("steelblue","blue")) +
+                    values = c("steelblue","orange")) +
   labs(
-    title = "Annual Job Creation (Dec-to-Dec)",
-    subtitle = "PAYEMS (Total Nonfarm Payrolls, SA). Recession shading: USREC.",
+    # title = "Annual Job Creation in 2025 was 584,000, one of the lowest, except recession years",
+    title = glue("Annual Job Creation in {latest_year} was {latest_job_creation},000 vs meidan {median},000 (since 2000), one of the lowest, except recession years"),
+    subtitle = "Recession (USREC) year shaded in gray",
     x = NULL,
     y = "Jobs (thousands)"
   ) +
   theme_minimal(base_size = 12) +
   theme(
+    plot.title.position = "plot",
+    plot.title = element_textbox_simple(),
     axis.text.x = element_text(angle = 45, hjust = 1),
     panel.background = element_blank(),
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+    
   )
 
-p +
-  geom_text(
-    aes(label = comma(round(annual_job_creation_k, 0))),
-    vjust = ifelse(df_year$annual_job_creation_k >= 0, -0.3, 1.2),
-    size = 3.5
-  )
 
