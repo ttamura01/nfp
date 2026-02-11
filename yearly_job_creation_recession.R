@@ -78,8 +78,8 @@ ggplot(df_year, aes(x = year_f, y = annual_job_creation_k, fill = if_latest_year
                     values = c("steelblue","orange")) +
   labs(
     # title = "Annual Job Creation in 2025 was 584,000, one of the lowest, except recession years",
-    title = glue("Annual Job Creation in {latest_year} was {latest_job_creation},000 vs meidan {median},000 (since 2000), one of the lowest, except recession years"),
-    subtitle = "Recession (USREC) year shaded in gray",
+    title = glue("Annual Job Creation in {latest_year} was {latest_job_creation},000 vs meidan {median},000 (since 2000), one of the lowest, except recession years, -- shaded in gray"),
+    caption = "sounce: FRED, by Takayuki Tamura", 
     x = NULL,
     y = "Jobs (thousands)"
   ) +
@@ -87,6 +87,7 @@ ggplot(df_year, aes(x = year_f, y = annual_job_creation_k, fill = if_latest_year
   theme(
     plot.title.position = "plot",
     plot.title = element_textbox_simple(),
+    plot.subtitle = element_text(color = "gray", face = "italic"),
     axis.text.x = element_text(angle = 45, hjust = 1),
     panel.background = element_blank(),
     panel.grid = element_blank(),

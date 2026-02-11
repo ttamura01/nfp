@@ -71,8 +71,8 @@ latest_nfp <- nfp_data %>%
 
 latest_monthly_status <- latest_nfp$monthly_change_status
 
-consensus <- 73
-latest_jobless <- 4.4
+consensus <- 55
+latest_jobless <- 4.3
 previsou_jobless <- 4.5
 
 jobless_change <- latest_jobless - previsou_jobless
@@ -120,16 +120,15 @@ nfp_data %>%
 
 nfp_data %>%  
   drop_na(monthly_change) %>% 
-  #filter(date >"1988-01-01" & (date < "2020-01-01" | date > "2020-10-01")) %>%
   filter(date >= "2021-01-01") %>% 
   ggplot(aes(x = date, y = monthly_change, fill = latest_month)) +
   geom_col(show.legend = FALSE) +
   labs(
     title = glue("Monthly Changes in US Non-Farm Payrolls in {latest_month} {year}, {latest_monthly_status} {latest_job_change},000, {comp_consensus} to the consensus at {consensus},000; Jobless Rate {jobless_status} to {latest_jobless}% from {previsou_jobless}%"),
-    #title = "US added only 22,000 jobs in August vs. market expected 75,000",
-       x = NULL,
-       y = "Monthly Change in NFP(x1,000)",
-       caption = "<i>FRED(Federal Reserve Economic Data)") +
+    # title = "Monthly Changes in US Non-Farm Payrolls in {January} {2026}, {increased} {130},000, {beat} to the consensus at {consensus},000; Jobless Rate {} to {4.3}% from {4.4}%",
+    x = NULL,
+    y = "Monthly Change in NFP(x1,000)",
+    caption = "<i>FRED(Federal Reserve Economic Data)") +
   scale_fill_manual(breaks = c(F,T),
                     values = c("#AAAAAA", "#0000FF")) +
   geom_text(data = subset(nfp_data, latest_month == TRUE), 
