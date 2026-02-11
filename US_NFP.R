@@ -12,12 +12,13 @@ fredr_set_key("0c5fd2514c7d98427fe3c931e2fcb244")
 
 # Overall unemployment
 nfp_data <- fredr(series_id = "PAYEMS") %>% 
-  select(date, nfp = value)
+  select(date, nfp = value) %>% 
+  mutate(month = month(date, label = TRUE, abbr = FALSE))
 
 ## import NFP data ("PAYEMS") to 'nfp_data'
 # nfp_data <- read.csv("https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23ebf3fb&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1320&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=PAYEMS&scale=left&cosd=1939-01-01&coed=2025-08-01&line_color=%230073e6&link_values=false&line_style=solid&mark_type=none&mw=3&lw=3&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2025-09-05&revision_date=2025-09-05&nd=1939-01-01") %>% 
 #   rename(date = observation_date, nfp = PAYEMS)
-  
+
 
 # updates <- tribble(
 #   ~date, ~nfp,
@@ -73,7 +74,7 @@ latest_monthly_status <- latest_nfp$monthly_change_status
 
 consensus <- 55
 latest_jobless <- 4.3
-previsou_jobless <- 4.5
+previsou_jobless <- 4.4
 
 jobless_change <- latest_jobless - previsou_jobless
 jobless_status <- if_else(jobless_change > 0, "rose",
@@ -84,8 +85,8 @@ jobless_status <- if_else(jobless_change > 0, "rose",
 compared_consensus <- latest_nfp %>% 
   mutate(vs_consensus = if_else(monthly_change > consensus, "beat",
                                 if_else(monthly_change < consensus, "fell short",
-                         "flat")))
-    
+                                        "flat")))
+
 comp_consensus <- compared_consensus$vs_consensus
 
 # month("2025-08-01", )
@@ -111,11 +112,11 @@ nfp_data %>%
        y = "Monthly Change in NFP(x1,000)",
        caption = "FRED(Federal Reserve Economic Data)") +
   scale_fill_manual(breaks = c(F,T),
-                     values = c("#AAAAAA", "#0000FF")) +
+                    values = c("#AAAAAA", "#0000FF")) +
   theme(
     plot.title.position = "plot",
     plot.title = element_textbox_simple())
-  
+
 ## add the latest label 
 
 nfp_data %>%  
@@ -131,16 +132,29 @@ nfp_data %>%
     caption = "<i>FRED(Federal Reserve Economic Data)") +
   scale_fill_manual(breaks = c(F,T),
                     values = c("#AAAAAA", "#0000FF")) +
-  geom_text(data = subset(nfp_data, latest_month == TRUE), 
-            aes(label = glue("{monthly_change}")), vjust = -0.5, hjust = 0.5,
-            color = "blue") +
+  # geom_text(data = subset(nfp_data, latest_month == TRUE), 
+  #           aes(label = glue("{monthly_change}")), vjust = -0.5, hjust = 0.5,
+  #           color = "blue") +
+  geom_text(data = subset(nfp_data, latest_month == TRUE),
+            aes(label = glue("{month}:{monthly_change},000"), y = 1000), 
+            fontface = "bold",
+            color ="blue",
+            hjust = 0.9) +
+  geom_segment(data = subset(nfp_data, latest_month == TRUE),
+               aes(x = date, xend = date,
+                   y = 1000 * 0.95, yend = monthly_change),
+               color = "gray") +
+  coord_cartesian(ylim = c(-200, 1100), 
+                  xlim = c(as.Date("2020-11-01"), as.Date(latest_nfp$date)), 
+                  clip = "off", expand = FALSE) +
   theme_classic() +
   theme(
     plot.title.position = "plot",
     plot.title = element_textbox_simple(size = 20, face = "bold"),
     plot.caption.position = "panel",
     # plot.caption = element_textbox_simple())
-    plot.caption = element_markdown())
+    plot.caption = element_markdown(),
+    plot.margin = margin_auto(10, 20))
 
 ggsave("monthly_nfp.png", height = 6, width = 6.5)
 
