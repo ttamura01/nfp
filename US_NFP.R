@@ -64,7 +64,7 @@ latest_month <- month(highlight_data$date, label = TRUE, abbr = FALSE)
 year <- year(highlight_data$date)
 latest_job_change <- highlight_data$monthly_change
 latest_nfp <- nfp_data %>% 
-  filter(latest_month == T) %>% 
+  filter(date == max(date)) %>% 
   mutate(monthly_change_status = if_else(is.na(monthly_change), NA_character_,
                                          if_else(monthly_change > 0, "increased",
                                                  if_else(monthly_change < 0, "decreased", 
@@ -129,7 +129,7 @@ nfp_data %>%
     # title = "Monthly Changes in US Non-Farm Payrolls in {January} {2026}, {increased} {130},000, {beat} to the consensus at {consensus},000; Jobless Rate {} to {4.3}% from {4.4}%",
     x = NULL,
     y = "Monthly Change in NFP(x1,000)",
-    caption = "<i>FRED(Federal Reserve Economic Data)") +
+    caption = "<i>FRED(Federal Reserve Economic Data), by Takayuki Tamura") +
   scale_fill_manual(breaks = c(F,T),
                     values = c("#AAAAAA", "#0000FF")) +
   # geom_text(data = subset(nfp_data, latest_month == TRUE), 
@@ -150,7 +150,7 @@ nfp_data %>%
   theme_classic() +
   theme(
     plot.title.position = "plot",
-    plot.title = element_textbox_simple(size = 20, face = "bold"),
+    plot.title = element_textbox_simple(size = 14, margin = margin_auto(10, 10)),
     plot.caption.position = "panel",
     # plot.caption = element_textbox_simple())
     plot.caption = element_markdown(),
