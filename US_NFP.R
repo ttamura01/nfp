@@ -72,8 +72,8 @@ latest_nfp <- nfp_data %>%
 
 latest_monthly_status <- latest_nfp$monthly_change_status
 
-consensus <- 55
-latest_jobless <- 4.3
+consensus <- 50
+latest_jobless <- 4.4
 previsou_jobless <- 4.4
 
 jobless_change <- latest_jobless - previsou_jobless
